@@ -20,7 +20,7 @@ namespace WebApplication4.Data
 
         public DbSet<Shift> Shifts { get; set; }
 
-        public DbSet<ShiftWithCapacity> ShiftWithCapacity { get; set; }
+        public DbSet<Scheduler> Scheduler { get; set; }
 
     }
 }

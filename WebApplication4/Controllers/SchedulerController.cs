@@ -15,26 +15,18 @@ namespace VotreNamespace.Controllers
             _schedulerService = schedulerService;
         }
 
-        [HttpGet("run")]
+        [HttpGet("scheduler")]
         public IActionResult RunScheduler()
         {
+            Scheduler scheduler = _schedulerService.GetScheduler();
 
-            try
+            if (scheduler != null)
             {
-                Dictionary<User, List<ShiftWithCapacity>> schedule = _schedulerService.RunScheduler();
-
-                // Convertir le dictionnaire en une liste de paires clé-valeur sérialisable
-                var serializableSchedule = schedule.Select(pair => new Schedule
-                {
-                    User = pair.Key,
-                    Shifts = pair.Value
-                }).ToList();
-
-                return Ok(serializableSchedule);
+                return Ok(scheduler); // Retourne un code HTTP 200 avec l'objet Scheduler
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, $"Scheduler execution failed: {ex.Message}");
+                return NotFound(); // Ou un autre code d'erreur selon la logique métier
             }
         }
     }

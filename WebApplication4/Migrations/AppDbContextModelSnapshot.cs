@@ -22,7 +22,22 @@ namespace WebApplication4.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WebApplication4.Model.Shift", b =>
+            modelBuilder.Entity("ShiftUser", b =>
+                {
+                    b.Property<int>("ShiftsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ShiftsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("ShiftUser");
+                });
+
+            modelBuilder.Entity("WebApplication4.Model.Scheduler", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,23 +45,12 @@ namespace WebApplication4.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("End")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Start")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Shifts");
+                    b.ToTable("Scheduler");
                 });
 
-            modelBuilder.Entity("WebApplication4.Model.ShiftWithCapacity", b =>
+            modelBuilder.Entity("WebApplication4.Model.Shift", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,12 +64,17 @@ namespace WebApplication4.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("SchedulerId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShiftWithCapacity");
+                    b.HasIndex("SchedulerId");
+
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("WebApplication4.Model.User", b =>
@@ -89,14 +98,29 @@ namespace WebApplication4.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebApplication4.Model.Shift", b =>
+            modelBuilder.Entity("ShiftUser", b =>
                 {
+                    b.HasOne("WebApplication4.Model.Shift", null)
+                        .WithMany()
+                        .HasForeignKey("ShiftsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebApplication4.Model.User", null)
-                        .WithMany("Shifts")
-                        .HasForeignKey("UserId");
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApplication4.Model.User", b =>
+            modelBuilder.Entity("WebApplication4.Model.Shift", b =>
+                {
+                    b.HasOne("WebApplication4.Model.Scheduler", null)
+                        .WithMany("Shifts")
+                        .HasForeignKey("SchedulerId");
+                });
+
+            modelBuilder.Entity("WebApplication4.Model.Scheduler", b =>
                 {
                     b.Navigation("Shifts");
                 });

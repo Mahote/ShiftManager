@@ -150,3 +150,4 @@ C:\Users\thomb\source\repos\ShiftManager\WebApplication4\obj\Debug\net7.0\refint
 C:\Users\thomb\source\repos\ShiftManager\WebApplication4\obj\Debug\net7.0\WebApplication4.pdb
 C:\Users\thomb\source\repos\ShiftManager\WebApplication4\obj\Debug\net7.0\WebApplication4.genruntimeconfig.cache
 C:\Users\thomb\source\repos\ShiftManager\WebApplication4\obj\Debug\net7.0\ref\WebApplication4.dll
+C:\Users\thomb\source\repos\ShiftManager\WebApplication4\obj\Debug\net7.0\WebApplication4.sourcelink.json
