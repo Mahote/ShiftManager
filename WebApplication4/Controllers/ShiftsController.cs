@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using WebApplication4.Model;
 using WebApplication4.Services;
 
@@ -7,87 +6,51 @@ namespace WebApplication4.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ShiftsController : ControllerBase
+    public class ShiftController : ControllerBase
     {
-        private readonly ShiftsService _shiftService;
+        private readonly ShiftService _shiftService;
 
-        public ShiftsController(ShiftsService shiftService)
+        public ShiftController(ShiftService shiftService)
         {
             _shiftService = shiftService;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Shift>> GetShifts()
+        public IActionResult GetAllShifts()
         {
-            var shifts = _shiftService.GetShifts();
+            var shifts = _shiftService.GetAllShifts();
             return Ok(shifts);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Shift> GetShiftById(int id)
+        [HttpGet("{shiftId}")]
+        public IActionResult GetShiftById(int shiftId)
         {
-            var shift = _shiftService.GetShiftById(id);
-
+            var shift = _shiftService.GetShiftById(shiftId);
             if (shift == null)
             {
                 return NotFound();
             }
-
             return Ok(shift);
         }
 
         [HttpPost]
-        public ActionResult<Shift> CreateShift([FromBody] Shift shift)
+        public IActionResult CreateShift(Shift shift)
         {
-            if (shift == null)
-            {
-                return BadRequest("Invalid shift data");
-            }
-            var createdShift = _shiftService.CreateShift(shift);
-            if (createdShift)
-            {
-                return StatusCode(201, createdShift);
-            }
-            else
-            {
-                return StatusCode(500, "Failed to create shift");
-            }
-            
+            _shiftService.CreateShift(shift);
+            return CreatedAtAction(nameof(GetShiftById), new { shiftId = shift.Id }, shift);
         }
 
-        [HttpPut()]
-        public IActionResult UpdateShift([FromBody] Shift updatedShift)
+        [HttpPut("{shiftId}")]
+        public IActionResult UpdateShift(int shiftId, Shift shift)
         {
-            if (updatedShift == null || updatedShift.Id == 0)
-            {
-                return BadRequest("Invalid user data or missing user ID");
-            }
-
-            var shiftToUpdate = _shiftService.GetShiftById(updatedShift.Id);
-            if (shiftToUpdate == null)
-            {
-                return NotFound();
-            }
-
-            var updated = _shiftService.UpdateShift(shiftToUpdate);
-            if(updated == null)
-            {
-                return BadRequest("Failed to update shift");
-            }
-
+            _shiftService.UpdateShift(shiftId, shift);
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteShift(int id)
+        [HttpDelete("{shiftId}")]
+        public IActionResult DeleteShift(int shiftId)
         {
-            var deleted = _shiftService.DeleteShift(id);
-
-            if (!deleted)
-            {
-                return NotFound();
-            }
-
+            _shiftService.DeleteShift(shiftId);
             return NoContent();
         }
     }

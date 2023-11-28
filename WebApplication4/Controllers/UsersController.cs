@@ -4,13 +4,13 @@ using WebApplication4.Services;
 
 namespace WebApplication4.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly UsersService _userService;
+        private readonly UserService _userService;
 
-        public UsersController(UsersService userService)
+        public UserController(UserService userService)
         {
             _userService = userService;
         }
@@ -18,102 +18,56 @@ namespace WebApplication4.Controllers
         [HttpGet]
         public IActionResult GetAllUsers()
         {
-            var users = _userService.GetUsers();
+            var users = _userService.GetAllUsers();
             return Ok(users);
         }
 
         [HttpGet("{userId}")]
         public IActionResult GetUserById(int userId)
         {
-            var user = _userService.GetById(userId);
+            var user = _userService.GetUserById(userId);
             if (user == null)
             {
                 return NotFound();
             }
-
             return Ok(user);
+        }
+
+        [HttpPost]
+        public IActionResult CreateUser(User user)
+        {
+            try
+            {
+                _userService.CreateUser(user);
+                return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, user);
+            }
+            catch (Exception ex)
+            {
+                // Log l'erreur ou retourne un message d'erreur approprié
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
+            }
+        }
+
+        [HttpPut("{userId}")]
+        public IActionResult UpdateUser(int userId, User user)
+        {
+            _userService.UpdateUser(userId, user);
+            return NoContent();
         }
 
         [HttpDelete("{userId}")]
         public IActionResult DeleteUser(int userId)
         {
-            var deleted = _userService.DeleteByUserId(userId);
-            if (!deleted)
-            {
-                return NotFound();
-            }
-
+            _userService.DeleteUser(userId);
             return NoContent();
         }
 
-        [HttpPut]
-        public IActionResult UpdateUser([FromBody] User updatedUser)
+        [HttpPost("{userId}/assignshift/{shiftId}")]
+        public IActionResult AssignShiftToUser(int userId, int shiftId)
         {
-            if (updatedUser == null || updatedUser.Id == 0)
-            {
-                return BadRequest("Invalid user data or missing user ID");
-            }
-
-            var userToUpdate = _userService.GetById(updatedUser.Id);
-            if (userToUpdate == null)
-            {
-                return NotFound();
-            }
-
-            userToUpdate.Name = updatedUser.Name;
-            userToUpdate.Surname = updatedUser.Surname;
-
-            var updated = _userService.UpdateUser(userToUpdate);
-            if (!updated)
-            {
-                return BadRequest("Failed to update user");
-            }
-
-            return NoContent();
-        }
-
-        [HttpPost]
-        public IActionResult CreateUser([FromBody] User newUser)
-        {
-            if (newUser == null)
-            {
-                return BadRequest("Invalid user data");
-            }
-
-            var userCreated = _userService.CreateUser(newUser);
-
-            if (userCreated != null)
-            {
-                return StatusCode(201, userCreated);
-            }
-            else
-            {
-                return StatusCode(500, "Failed to create user");
-            }
-        }
-
-        [HttpPost("{userId}/shift")]
-        public IActionResult AddShiftToUser(int userId, [FromBody] Shift shift)
-        {
-            var shiftadded = _userService.AddShiftToUser(userId, shift);
-            if (!shiftadded)
-            {
-                return NotFound();
-            }
-
-            return Ok(shiftadded);
-        }
-
-        [HttpGet("{userId}/shift")]
-            public IActionResult GetUsersShifts(int userId)
-        {
-            var shifts = _userService.GetUsersShifts(userId);
-            if (shifts == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(shifts);
+            _userService.AssignShiftToUser(userId, shiftId);
+            
+            return Ok($"L'utilisateur avec l'ID {userId} a été associé au quart de travail avec l'ID {shiftId}.");
         }
     }
 }

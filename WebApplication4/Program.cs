@@ -8,8 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(); // construire le context
 builder.Services.AddControllers();
-builder.Services.AddScoped<UsersService>();
-builder.Services.AddScoped<ShiftsService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ShiftService>();
 builder.Services.AddScoped<Scheduler>();
 builder.Services.AddScoped<SchedulerService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

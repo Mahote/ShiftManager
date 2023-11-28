@@ -1,87 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿using WebApplication4.Data;
 using WebApplication4.Model;
-using WebApplication4.Data; // Assurez-vous d'importer le bon namespace pour votre DbContext
 
 namespace WebApplication4.Services
 {
-    public class ShiftsService
+    public class ShiftService
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
 
-        public ShiftsService(AppDbContext context)
+        public ShiftService(AppDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
-        public IEnumerable<Shift> GetShifts()
+        public IEnumerable<Shift> GetAllShifts()
         {
-            return _context.Shifts.ToList();
+            return _dbContext.Shifts.ToList();
         }
 
-        public Shift GetShiftById(int id)
+        public Shift GetShiftById(int shiftId)
         {
-            var shift = _context.Shifts.FirstOrDefault(s => s.Id == id);
-            if (shift == null)
-            {
-                return null;
-            }
-
-            return shift;
-
-            
+            return _dbContext.Shifts.FirstOrDefault(s => s.Id == shiftId);
         }
 
-        public bool CreateShift(Shift shift)
+        public void CreateShift(Shift shift)
         {
-            if (shift == null)
-            {
-                return false; // Indicates if the user is null
-            }
-
-            try
-            {
-                _context.Shifts.Add(shift);
-                _context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false; // Indicates internal server error
-            }
+            _dbContext.Shifts.Add(shift);
+            _dbContext.SaveChanges();
         }
 
-        public Shift UpdateShift(Shift updatedShift)
+        public void UpdateShift(int shiftId, Shift updatedShift)
         {
-            var existingShift = _context.Shifts.FirstOrDefault(s => s.Id == updatedShift.Id);
-
+            var existingShift = _dbContext.Shifts.FirstOrDefault(s => s.Id == shiftId);
             if (existingShift != null)
             {
                 existingShift.Start = updatedShift.Start;
                 existingShift.End = updatedShift.End;
+                existingShift.Capacity = updatedShift.Capacity;
+                // Mettre à jour d'autres propriétés si nécessaire
 
-                _context.SaveChanges();
-                return updatedShift;
+                _dbContext.SaveChanges();
             }
-            return null;
-            
         }
 
-        public bool DeleteShift(int id)
+        public void DeleteShift(int shiftId)
         {
-            var shiftToRemove = _context.Shifts.FirstOrDefault(s => s.Id == id);
-
-            if (shiftToRemove == null)
+            var shiftToDelete = _dbContext.Shifts.FirstOrDefault(s => s.Id == shiftId);
+            if (shiftToDelete != null)
             {
-                return false;
+                _dbContext.Shifts.Remove(shiftToDelete);
+                _dbContext.SaveChanges();
             }
-
-            _context.Shifts.Remove(shiftToRemove);
-            _context.SaveChanges();
-
-            return true;
         }
     }
 }
